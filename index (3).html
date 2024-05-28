@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Falling Objects Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 600px;
+            height: 800px;
+            background-color: #87CEEB;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+
+        #basket {
+            position: absolute;
+            bottom: 10px;
+            width: 100px;
+            height: 30px;
+            background-color: #8B4513;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .fallingObject {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #FF6347;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div id="basket"></div>
+    </div>
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const basket = document.getElementById('basket');
+        const gameAreaWidth = gameArea.clientWidth;
+        const gameAreaHeight = gameArea.clientHeight;
+        let score = 0;
+
+        // Move the basket with arrow keys
+        document.addEventListener('keydown', function(event) {
+            const basketLeft = basket.offsetLeft;
+            if (event.key === 'ArrowLeft' && basketLeft > 0) {
+                basket.style.left = basketLeft - 20 + 'px';
+            }
+            if (event.key === 'ArrowRight' && basketLeft < gameAreaWidth - basket.clientWidth) {
+                basket.style.left = basketLeft + 20 + 'px';
+            }
+        });
+
+        // Create falling objects at random intervals
+        function createFallingObject() {
+            const fallingObject = document.createElement('div');
+            fallingObject.classList.add('fallingObject');
+            fallingObject.style.left = Math.random() * (gameAreaWidth - 30) + 'px';
+            gameArea.appendChild(fallingObject);
+
+            let fallingInterval = setInterval(function() {
+                const objectTop = fallingObject.offsetTop;
+                if (objectTop > gameAreaHeight) {
+                    gameArea.removeChild(fallingObject);
+                    clearInterval(fallingInterval);
+                } else {
+                    fallingObject.style.top = objectTop + 5 + 'px';
+                }
+
+                // Check if the object is caught by the basket
+                const basketRect = basket.getBoundingClientRect();
+                const objectRect = fallingObject.getBoundingClientRect();
+                if (objectRect.bottom >= basketRect.top &&
+                    objectRect.left >= basketRect.left &&
+                    objectRect.right <= basketRect.right) {
+                    gameArea.removeChild(fallingObject);
+                    clearInterval(fallingInterval);
+                    score++;
+                    console.log('Score:', score);
+                }
+            }, 50);
+        }
+
+        // Create falling objects at random intervals
+        setInterval(createFallingObject, 1000);
+    </script>
+</body>
+</html>
